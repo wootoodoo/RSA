@@ -1,19 +1,7 @@
-#include <iostream>
-#include <stdio.h>
-#include <vector>
-#include <time.h>
-#include <stdlib.h>
-#include <sstream>
+#include "XP.h"
 
 using namespace std;
 
-#define N  100         // maximum number of digits supported
-#define NN (2*N + 1)   // number of digits allocated
-
-typedef struct {
-   unsigned char digit[NN];
-   int length;
-} XP;
 
 XP XPinitDecimal(string s) {
    XP a;
@@ -67,18 +55,85 @@ XP XPrand(int n) {
    return out;
 }
 
+bool XPisOdd(XP a) {
+   char lastDigit = a.digit[NN - 1];
+   return lastDigit % 2 == 1;
+}
+
+int XPgreater(XP a, XP b) {
+   if (a.length > b.length) {return 1;}
+   if (a.length == b.length) {
+      for (int i = 0; i < a.length; i++) {
+         if (a.digit[NN - a.length + i] > b.digit[NN - a.length + i]) {return 1;}
+         if (a.digit[NN - a.length + i] == b.digit[NN - a.length + i]) {continue;}
+         else break;
+      }
+   }
+   return -1;
+}
+
+int XPless(XP a, XP b) {
+   if (a.length < b.length) {return 1;}
+   if (a.length == b.length) {
+      for (int i = 0; i < a.length; i++) {
+         if (a.digit[NN - a.length + i] < b.digit[NN - a.length + i]) {return 1;}
+         if (a.digit[NN - a.length + i] == b.digit[NN - a.length + i]) {continue;}
+         else break;
+      }
+   }
+   return -1;
+}
+
+int XPeq(XP a, XP b) {
+   if (a.length == b.length) {
+      for (int i = 0; i < a.length; i++) {
+         if (i == a.length - 1 && a.digit[NN - a.length + i] == b.digit[NN - a.length + i]) {return 1;}
+         if (a.digit[NN - a.length + i] == b.digit[NN - a.length + i]) {continue;}
+         else break;
+      }
+   }
+   return -1;
+}
+
+XP XPsub(XP a, XP b) {
+   if (XPless(a, b) == 1) throw "first XP is less than 2nd XP!";
+   unsigned char sub[NN] = {0};
+
+   for (int i = NN - 1; i >= NN - a.length; i--) {
+      if (a.digit[i] == 0) {
+         a.digit[i] += 10;
+         sub[i - 1]++;
+      }
+      a.digit[i] -= sub[i];
+      if (i == NN - a.length && a.digit[i] == 0) {
+         a.length--;
+      }
+      if (a.digit[i] < b.digit[i]) {
+         a.digit[i] += 10;
+         sub[i - 1]++;
+      }
+      a.digit[i] -= b.digit[i];
+   }
+   return a;
+}
+
 int main() {
    XP a, b, c;
    
    try {
-      a = XPinitDecimal("123456789");   // a   = 123456789
-      b = XPinitDecimal("54545454");    // b   =  54545454
+      a = XPinitDecimal("1234567890");   // a   = 123456789
+      b = XPinitDecimal("545454545");    // b   =  54545454
       c = XPadd(a, b);                  // c   =  a + b
       XPshowDecimal(c);                 // print 178002243
       XPshowDecimal(XPrand(99));
+      printf(XPisOdd(c) ? "true" : "false");
+      cout << endl;
+      printf("%d\n", XPgreater(a, b));
+      printf("%d\n", XPless(b, a));
+      printf("%d\n", XPeq(a, a));
+      XPshowDecimal(XPsub(a, b));
    } catch (string msg) {
-      cerr << msg << endl;
+      cout << msg << endl;
    }
 
 }
-
