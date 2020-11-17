@@ -1,6 +1,10 @@
 #include <iostream>
 #include <stdio.h>
 #include <vector>
+#include <time.h>
+#include <stdlib.h>
+#include <sstream>
+
 using namespace std;
 
 #define N  100         // maximum number of digits supported
@@ -13,7 +17,7 @@ typedef struct {
 
 XP XPinitDecimal(string s) {
    XP a;
-   int length = s.size(); //sizeof(s)/sizeof(s[0]);
+   int length = s.size(); 
    a.length = length;
    if (length > N) throw "length of input is larger than N!";
 
@@ -35,33 +39,43 @@ void XPshowDecimal(XP c) {
 }
 
 XP XPadd(XP a, XP b) {
-   unsigned char sum[NN];
-   XP c;
-   int count = 0;
+   unsigned char sum[NN] = {0};
+   XP c = XPinitDecimal("0");
 
-   for (int i = NN - 1; i >= 0; i--) {
+   for (int i = NN - 1; i > 0; i--) {
       char x = a.digit[i] + b.digit[i] + sum[i];
+      if (x > 0 && i < NN - 1) c.length++;
       if (x > 9) {
          sum[i - 1] = 1;
          x -= 10;
       }
       c.digit[i] = x;
-      if (x > 0) count++;
    }
-   c.length = count;
-   
    return c;
+}
+
+XP XPrand(int n) {
+   int x;
+   stringstream ss;
+
+   srand (time(NULL));
+   for (int i = 0; i < n; i++) {
+      x = rand() % 10;
+      ss << x;
+   }
+   XP out = XPinitDecimal(ss.str());
+   return out;
 }
 
 int main() {
    XP a, b, c;
-   
    
    try {
       a = XPinitDecimal("123456789");   // a   = 123456789
       b = XPinitDecimal("54545454");    // b   =  54545454
       c = XPadd(a, b);                  // c   =  a + b
       XPshowDecimal(c);                 // print 178002243
+      XPshowDecimal(XPrand(99));
    } catch (string msg) {
       cerr << msg << endl;
    }
