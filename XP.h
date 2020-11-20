@@ -27,3 +27,4 @@ int XPless(XP a, XP b);             // If a is less than b, then return 1. Else 
 int XPeq(XP a, XP b);               // If a is equal to b, then return 1. Else it returns -1
 XP XPsub(XP a, XP b);               // Multiplication of a and b
 Div XPdiv(XP a, XP b);              // Division of a by b, returns the quotient and remainder in Div struct
+XP XPrsa(XP a, XP b, XP n);         // Does the RSA calculation a ^ b mod n

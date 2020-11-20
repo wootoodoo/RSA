@@ -180,27 +180,47 @@ Div XPdiv(XP a, XP b) {          // Division of a by b, returns the quotient and
    }
 }
 
-int main() {
-   XP a, b, c;
+XP XPrsa(XP a, XP b, XP n) {                          // Does the RSA calculation a ^ b mod n
+   XP t, c;
+   if (XPgreater(b, XPinitDecimal("3")) == 1) {       // if b is larger than 3, need to recurse
+      t = XPrsa(a, XPdiv(b, XPinitDecimal("2")).quotient, n);
+      c = XPdiv(XPmul(t, t), n).remainder;            // c = (t * t) mod n
+   }
+   else if (XPeq(b, XPinitDecimal("3")) == 1) {       // special case for when b is equals to 3
+      t = XPdiv(XPmul(a, a), n).remainder;
+      c = XPdiv(XPmul(t, a), n).remainder;
+   }
+   else {                                             // b is equals to 2
+      c = XPdiv(XPmul(a, a), n).remainder;
+   }
    
+   if (XPisOdd(b) && XPgreater(b, XPinitDecimal("3")) == 1) {        // if b is odd, must multiply by a one more time
+      c = XPdiv(XPmul(c, a), n).remainder;
+   }
+   return c;
+}
+
+int main() {
+   XP a, b, n;
    
    try {
       string in = "";
-      int n = 0;
+
       while (true) // Code for debugging
       {
-         Div result;
+         XP result;
          cout << "a: ";
          getline(cin, in);
          a = XPinitDecimal(in);
          cout << "b: ";
          getline(cin, in);
          b = XPinitDecimal(in);
-         result = XPdiv(a, b);
-         cout << "quotient: ";
-         XPshowDecimal(result.quotient);
+         cout << "n: ";
+         getline(cin, in);
+         n = XPinitDecimal(in);
+         result = XPrsa(a, b, n);
          cout << "remainder: ";
-         XPshowDecimal(result.remainder);
+         XPshowDecimal(result);
       }
       
    } catch (string msg) {
